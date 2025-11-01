@@ -15,7 +15,7 @@ start_time = time.time()
 
 # --- 1. LOAD THE FULL LONG-FORMAT DATA ---
 try:
-    df = pd.read_csv("data_long_format_v7_full.csv")
+    df = pd.read_csv("../../dataset/data_long_format_v7_full.csv")
 except FileNotFoundError:
     print("ERROR: 'data_long_format_v7_full.csv' not found.")
     print("Please run the 'convert_to_long_format_v7.py' script first.")
