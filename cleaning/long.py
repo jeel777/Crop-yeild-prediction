@@ -3,7 +3,6 @@ import numpy as np
 
 print("Starting data conversion (Version 7, Memory-Safe)...")
 
-# --- 1. LOAD DATA ---
 input_file = "ICRISAT_Dataset.csv" 
 try:
     df = pd.read_csv(input_file)
@@ -13,18 +12,14 @@ except FileNotFoundError:
 
 print(f"Loaded file shape: {df.shape}")
 
-# --- 2. CLEAN COLUMN NAMES ---
 print("Cleaning column names...")
 df.columns = df.columns.str.strip().str.replace(' ', '_')
 
-# --- 3. DEFINE PREDICTOR & CROP COLUMNS ---
-# Define the columns that identify a unique row (the predictors)
 id_vars = [
     'Dist_Code', 'Year', 'State_Code', 'State_Name', 'Dist_Name',
     'GROSS_CROPPED_AREA_(1000_ha)', 'NITROGEN_CONSUMPTION_(tons)',
     'PHOSPHATE_CONSUMPTION_(tons)', 'POTASH_CONSUMPTION_(tons)',
     'TOTAL_FERTILISER_CONSUMPTION_(tons)',
-    # 'TOTAL_AGRICULTURAL_LABOUR_POPULATION_(1000_Number)', # Still dropping this
     'GROSS_IRRIGATED_AREA_(1000_ha)',
     'JANUARY_MAXIMUM_TEMPERATURE_(Centigrate)',
     'FEBRUARY_MAXIMUM_TEMPERATURE_(Centigrate)',
@@ -108,15 +103,11 @@ id_vars = [
     'Autumn_OCT-DEC_WINDSPEED_(Meter_per_second)'
 ]
 
-# Define the columns for each metric
 area_cols = ['RICE_AREA_(1000_ha)', 'PEARL_MILLET_AREA_(1000_ha)', 'CHICKPEA_AREA_(1000_ha)', 'GROUNDNUT_AREA_(1000_ha)', 'SUGARCANE_AREA_(1000_ha)']
 prod_cols = ['RICE_PRODUCTION_(1000_tons)', 'PEARL_MILLET_PRODUCTION_(1000_tons)', 'CHICKPEA_PRODUCTION_(1000_tons)', 'GROUNDNUT_PRODUCTION_(1000_tons)', 'SUGARCANE_PRODUCTION_(1000_tons)']
 yield_cols = ['RICE_YIELD_(Kg_per_ha)', 'PEARL_MILLET_YIELD_(Kg_per_ha)', 'CHICKPEA_YIELD_(Kg_per_ha)', 'GROUNDNUT_YIELD_(Kg_per_ha)', 'SUGARCANE_YIELD_(Kg_per_ha)']
 
-# Define the crop names (must be in the same order)
 crop_names = ['RICE', 'PEARL_MILLET', 'CHICKPEA', 'GROUNDNUT', 'SUGARCANE']
-
-# --- 4. MELT AND MERGE (Memory-Safe Method) ---
 
 def melt_metric(df, id_vars, value_vars, metric_name, crop_names):
     """Helper function to melt one metric."""
@@ -126,7 +117,6 @@ def melt_metric(df, id_vars, value_vars, metric_name, crop_names):
         var_name='Crop_Name', 
         value_name=metric_name
     )
-    # Map the full column name (e.g., 'RICE_AREA_(1000_ha)') to the crop name
     crop_map = dict(zip(value_vars, crop_names))
     df_melted['Crop'] = df_melted['Crop_Name'].map(crop_map)
     df_melted = df_melted.drop('Crop_Name', axis=1)
@@ -141,18 +131,14 @@ df_prod = melt_metric(df, id_vars, prod_cols, 'PRODUCTION', crop_names)
 print("Melting YIELD data...")
 df_yield = melt_metric(df, id_vars, yield_cols, 'YIELD', crop_names)
 
-# Define the key to merge on (all predictors + the new Crop column)
 merge_keys = id_vars + ['Crop']
 
 print("Merging AREA and PRODUCTION data...")
-# Merge Area and Production
 df_final = pd.merge(df_area, df_prod, on=merge_keys, how='outer')
 
 print("Merging YIELD data...")
-# Merge the result with Yield
 df_final = pd.merge(df_final, df_yield, on=merge_keys, how='outer')
 
-# --- 5. SAVE THE FINAL FILE ---
 output_filename = 'data_long_format_v7_full.csv'
 print(f"Saving final long-format file as: {output_filename}")
 df_final.to_csv(output_filename, index=False)

@@ -2,9 +2,7 @@ import pandas as pd
 
 print("--- Duplicate Row Checker ---")
 
-# --- 1. LOAD YOUR ORIGINAL WIDE-FORMAT DATA ---
-# *** ACTION REQUIRED ***
-# Change this to the name of your 12,803-row CSV file
+
 input_file = "ICRISAT_Dataset.csv" 
 
 try:
@@ -16,13 +14,9 @@ except FileNotFoundError:
 print(f"Successfully loaded file '{input_file}'.")
 print(f"Total rows in file: {len(df)}")
 
-# --- 2. CLEAN COLUMN NAMES ---
-# This is the same logic as the conversion script
+
 df.columns = df.columns.str.strip().str.replace(' ', '_')
 
-# --- 3. DEFINE PREDICTOR COLUMNS ---
-# These are the columns that define a "unique entry"
-# (all the id_vars from the last script)
 predictor_columns = [
     'Dist_Code', 'Year', 'State_Code', 'State_Name', 'Dist_Name',
     'GROSS_CROPPED_AREA_(1000_ha)', 'NITROGEN_CONSUMPTION_(tons)',
@@ -112,14 +106,11 @@ predictor_columns = [
     'Autumn_OCT-DEC_WINDSPEED_(Meter_per_second)'
 ]
 
-# --- 4. CHECK FOR DUPLICATES ---
-# We check for duplicates based *only* on the predictor columns.
-# We keep 'first' to get the count of unique rows.
+
 num_unique_rows = len(df.drop_duplicates(subset=predictor_columns, keep='first'))
 
 num_duplicate_rows = len(df) - num_unique_rows
 
-# --- 5. PRINT REPORT ---
 print("\n--- DUPLICATE REPORT ---")
 print(f"Total rows loaded: {len(df)}")
 print(f"Unique predictor sets (District, Year, Weather, etc.): {num_unique_rows}")
@@ -131,20 +122,15 @@ if num_duplicate_rows > 0:
     print("District/Year/Weather combination. This is why the")
     print("conversion script is 'collapsing' them by averaging.")
     
-    # Let's find and show an example
     print("\nFinding an example of a duplicate entry...")
-    # This gets a list of True/False for duplicates
     dupes = df.duplicated(subset=predictor_columns, keep=False)
     
     if dupes.any():
-        # Get all rows that are duplicates
         df_dupes = df[dupes]
         
-        # Sort them so we can see them grouped together
         df_dupes_sorted = df_dupes.sort_values(by=['Dist_Name', 'Year'])
         
         print("--- Example of Duplicate Predictor Rows ---")
-        # Print the first 5 rows from the sorted duplicates
         print(df_dupes_sorted.head())
         print("---------------------------------------------")
         print("\nNotice how the 'Dist_Name', 'Year', and weather data might")
