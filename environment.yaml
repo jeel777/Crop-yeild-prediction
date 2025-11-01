@@ -1,0 +1,22 @@
+name: crop-yield-project
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # --- Core ---
+  - python=3.10     # Using a stable, recent version of Python
+  - pip
+
+  # --- Data Manipulation ---
+  - pandas          # For loading and cleaning your data (CSV, etc.)
+  - numpy           # For numerical operations (used in data cleaning)
+  - odfpy           # For reading .ods files (your original file)
+
+  # --- Machine Learning ---
+  - scikit-learn    # For Random Forest, train_test_split, and metrics
+  - joblib          # For saving and loading your trained model
+
+  # --- Data Visualization & Notebooks (Highly Recommended) ---
+  - matplotlib      # For creating plots and graphs
+  - seaborn         # For advanced statistical plots
+  - jupyter         # For running experiments in a Jupyter Notebook
