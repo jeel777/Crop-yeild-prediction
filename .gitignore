@@ -1,0 +1,2 @@
+dataset/*
+training/crop_yield_model.joblib
