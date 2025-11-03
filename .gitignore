@@ -1,2 +1,3 @@
 dataset/*
-training/crop_yield_model.joblib
+training/random-forest-regressor/models/*
+training/XG/models/*

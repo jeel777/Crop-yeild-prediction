@@ -1,12 +1,10 @@
 import pandas as pd
 import numpy as np
 
-# Load the full dataset
 print("Loading dataset...")
-df = pd.read_csv("ICRISAT_Dataset.csv")
+df = pd.read_csv("dataset/data_long_format_v7_full.csv")
 print(f"Total rows in dataset: {len(df)}")
 
-# Sample 11,000 random rows
 n_samples = 11000
 if len(df) < n_samples:
     print(f"Warning: Dataset has only {len(df)} rows, which is less than {n_samples}.")
@@ -17,7 +15,7 @@ else:
     print(f"Sampled {n_samples} random rows.")
 
 # Save to testdata.csv
-output_filename = "testdata.csv"
+output_filename = "testdatav2.csv"
 test_df.to_csv(output_filename, index=False)
 print(f"\nTest data saved successfully as: {output_filename}")
 print(f"Shape: {test_df.shape}")
