@@ -1,3 +1,4 @@
-dataset/*
+dataset/test_data.csv
+dataset/train_data.csv
 training/random-forest-regressor/models/*
 training/XG/models/*

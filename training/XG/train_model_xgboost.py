@@ -13,21 +13,23 @@ import joblib
 print("Starting model training process (v3 with Imputation and y-NaN drop)...")
 start_time = time.time()
 
-# --- 1. LOAD THE FULL LONG-FORMAT DATA ---
+# --- 1. LOAD THE TRAINING DATA ---
 try:
-    df = pd.read_csv("../../dataset/data_long_format_v7_full.csv")
+    df = pd.read_csv("../../dataset/train_data.csv")
 except FileNotFoundError:
-    print("ERROR: 'data_long_format_v7_full.csv' not found.")
-    print("Please run the 'convert_to_long_format_v7.py' script first.")
+    print("ERROR: 'train_data.csv' not found.")
+    print("Please run 'create_train_test_split.py' script first in dataset/ folder.")
+    print("\nTo create the split:")
+    print("  cd ../../dataset/")
+    print("  python create_train_test_split.py")
     exit()
 
-print(f"Data loaded successfully. Shape: {df.shape}")
+print(f"Training data loaded successfully. Shape: {df.shape}")
 
 # --- 2. DEFINE TARGET and HANDLE ITS MISSING VALUES ---
 target = 'YIELD'
 
-# *** THIS IS THE FIX ***
-# Check for missing values in the target 'y'
+# The train_data.csv should already have NaN values removed, but double-check
 missing_y_count = df[target].isnull().sum()
 if missing_y_count > 0:
     print(f"Found {missing_y_count} rows with missing YIELD. Dropping them.")
@@ -65,7 +67,8 @@ X_train, X_test, y_train, y_test = train_test_split(
     test_size=0.2, 
     random_state=42
 )
-print(f"Data split: {len(X_train)} training rows, {len(X_test)} testing rows.")
+print(f"Data split for validation: {len(X_train)} training rows, {len(X_test)} validation rows.")
+print(f"Note: This is a validation split. Final testing should use test_data.csv")
 
 # --- 6. CREATE A PREPROCESSING AND MODELING PIPELINE ---
 numerical_transformer = Pipeline(steps=[
@@ -141,7 +144,9 @@ except Exception as e:
 
 # --- 10. SAVE THE FINAL MODEL ---
 print("\n--- Saving Model ---")
-model_filename = 'crop_yield_model_v3.joblib'
+model_filename = 'models/crop_yield_model_xgb_latest.joblib'
 joblib.dump(clf, model_filename)
 print(f"Model saved successfully as: {model_filename}")
+print(f"\n⚠️  IMPORTANT: This model was trained on train_data.csv")
+print(f"   For final evaluation, test on test_data.csv (held-out data)")
 
